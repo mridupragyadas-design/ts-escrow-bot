@@ -1,5 +1,5 @@
 import { Telegraf } from 'telegraf';
-import { webhookCallback } from 'telegraf/express';
+import { webhookCallback } from 'telegraf';
 import fs from 'fs-extra';
 
 // ==================== CONFIG ====================
@@ -323,7 +323,7 @@ function setupBot(bot: Telegraf) {
                 const username = parts[1].replace('@', '');
                 try {
                     // Fix: Use ctx.telegram.getChatMember with username
-                    const chatMember = await ctx.telegram.getChatMember(ctx.chat.id, username);
+                    const chatMember = await ctx.telegram.getChatMember(ctx.chat.id, username as any);
                     targetUser = chatMember.user;
                 } catch (error) {
                     await ctx.reply(`❌ Could not find user @${username}`);
