@@ -1,3 +1,6 @@
 name = "ts-escrow-bot"
 main = "dist/index.js"
 compatibility_date = "2024-06-01"
+
+[vars]
+BOT_TOKEN = "8755962402:AAFmDhKFGp4I3gCCdH2eTLUaN4osLSfYbqI"
