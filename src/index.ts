@@ -112,8 +112,12 @@ bot.command('help', async (ctx) => {
     );
 });
 
-// Form handler (text or /form)
+// ============================================================
+// FORM HANDLER – FIXED
+// ============================================================
+// Check for "form" or "/form" or "deal" or "/deal"
 bot.hears(/^(form|\/form|\/deal|deal)$/i, async (ctx) => {
+    console.log('Form triggered!'); // Debug log
     const formMsg =
         '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
         '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
@@ -129,6 +133,29 @@ bot.hears(/^(form|\/form|\/deal|deal)$/i, async (ctx) => {
         '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
         'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
     await ctx.reply(formMsg);
+});
+
+// Also handle text messages that start with "form" (case insensitive)
+bot.on('text', async (ctx) => {
+    const text = ctx.message.text.toLowerCase().trim();
+    if (text === 'form' || text === '/form' || text === 'deal' || text === '/deal') {
+        console.log('Form triggered via text handler!');
+        const formMsg =
+            '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
+            '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
+            '• Deal Info:   \n' +
+            '• Buyer:   \n' +
+            '• Seller:  \n' +
+            '• Amount:  \n' +
+            '• Duration:  \n' +
+            '• Escrow Until:  \n' +
+            '• Releasee Condition: (Optional)\n\n' +
+            '𝙀𝙓𝙏𝙍𝘼\n' +
+            'CRYPTO ADDRESS : (Optional)\n\n' +
+            '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
+            'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
+        await ctx.reply(formMsg);
+    }
 });
 
 // /add command
@@ -177,15 +204,14 @@ bot.command('add', async (ctx) => {
         amount,
     });
 
-    const msg =
+    await ctx.reply(
         `💰 𝗙𝘂𝗻𝗱𝘀 𝗔𝗱𝗱𝗲𝗱✅,𝗣𝗮𝘆𝗺𝗲𝗻𝘁 𝗥𝗲𝗰𝗲𝗶𝘃𝗲𝗱,𝗖𝗼𝗻𝘁𝗶𝗻𝘂𝗲 𝗗𝗲𝗮𝗹!\n\n` +
         `🧑‍💼 Escrower: @${ctx.from.username || 'Unknown'}\n` +
         `💰 Amount: ₹${amount}\n` +
         `👨🏻‍💼 Buyer: ${buyer}\n` +
         `🙎🏻‍♂️ Seller: ${seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
-
-    await ctx.reply(msg);
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`
+    );
 });
 
 // /done command
@@ -217,7 +243,6 @@ bot.command('done', async (ctx) => {
         return;
     }
 
-    // Admin stats
     const userId = ctx.from.id.toString();
     const username = ctx.from.username || 'Unknown';
     const stats = loadStats();
@@ -229,9 +254,7 @@ bot.command('done', async (ctx) => {
     stats[userId].total += amt;
     saveStats(stats);
 
-    // User escrow stats
     const userStats = loadUserStats();
-
     const updateUserEscrow = (uname: string, amountVal: number) => {
         if (!uname || uname.trim() === '') return;
         const key = uname.toLowerCase().replace(/^@/, '');
@@ -246,15 +269,14 @@ bot.command('done', async (ctx) => {
     updateUserEscrow(tradeInfo.seller, amt);
     saveUserStats(userStats);
 
-    const msg =
+    await ctx.reply(
         `✅ 𝗙𝘂𝗻𝗱𝘀 𝗥𝗲𝗹𝗲𝗮𝘀𝗲𝗱/𝗧𝗿𝗮𝗱𝗲 𝗰𝗹𝗼𝘀𝗲𝗱!\n\n` +
         `🧑‍💼 Released By: @${ctx.from.username || 'Unknown'}\n` +
         `💸 Amount: ₹${tradeInfo.amount}\n` +
         `👨🏻‍💼 Buyer: ${tradeInfo.buyer}\n` +
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
-
-    await ctx.reply(msg);
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`
+    );
 });
 
 // /cancel command
@@ -286,14 +308,13 @@ bot.command('cancel', async (ctx) => {
         return;
     }
 
-    const msg =
+    await ctx.reply(
         `🔴 𝗧𝗿𝗮𝗱𝗲/𝗗𝗲𝗮𝗹 𝗖𝗮𝗻𝗰𝗲𝗹𝗹𝗲𝗱!!!!\n\n` +
         `👮🏻‍♂️ Cancelled By: @${ctx.from.username || 'Unknown'}\n` +
         `👨🏻‍💼 Buyer: ${tradeInfo.buyer}\n` +
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
-
-    await ctx.reply(msg);
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`
+    );
 });
 
 // /mydeals command
@@ -310,20 +331,17 @@ bot.command('mydeals', async (ctx) => {
     const count = stats[userId]?.count || 0;
     const total = stats[userId]?.total || 0;
 
-    const msg =
+    await ctx.reply(
         `📊 Your Escrow Stats @${username}\n` +
         `━━━━━━━━━━━━━━━\n` +
         `🧑‍💼 Total Escrows Closed: ${String(count).padStart(3, '0')}\n\n` +
         `💰 INR Deals: ${String(count).padStart(3, '0')} | ₹${total}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @mrixdufr`;
-
-    await ctx.reply(msg);
+        `⚙️ Powered by @mrixdufr`
+    );
 });
 
-// ============================================================
-// /info command – supports both reply and @username
-// ============================================================
+// /info command
 bot.command('info', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
         await ctx.reply('⚠️ Admin only!');
@@ -332,12 +350,9 @@ bot.command('info', async (ctx) => {
 
     let targetUser: any = null;
 
-    // Case 1: reply to a message
     if (ctx.message?.reply_to_message) {
         targetUser = ctx.message.reply_to_message.from;
-    }
-    // Case 2: /info @username
-    else {
+    } else {
         const text = ctx.message?.text || '';
         const parts = text.split(' ');
         if (parts.length > 1) {
@@ -357,11 +372,9 @@ bot.command('info', async (ctx) => {
         return;
     }
 
-    // Get group status
     let statusStr = 'Unknown';
     try {
         const member = await ctx.getChatMember(targetUser.id);
-        const status = member.status;
         const statusMap: Record<string, string> = {
             creator: 'Creator',
             administrator: 'Administrator',
@@ -370,17 +383,16 @@ bot.command('info', async (ctx) => {
             left: 'Left',
             banned: 'Banned',
         };
-        statusStr = statusMap[status] || 'Unknown';
+        statusStr = statusMap[member.status] || 'Unknown';
     } catch (error) {
         statusStr = 'Unknown (bot may need admin rights)';
     }
 
-    // Escrow stats
     const userStats = loadUserStats();
     const key = (targetUser.username || '').toLowerCase();
     const escrowInfo = userStats[key] || { total_escrows: 0, total_amount: 0 };
 
-    const msg =
+    await ctx.reply(
         `👤 User Info\n` +
         `━━━━━━━━━━━━━━━\n` +
         `🆔 ID: ${targetUser.id}\n` +
@@ -393,16 +405,15 @@ bot.command('info', async (ctx) => {
         `✅ Total Escrows: ${escrowInfo.total_escrows}\n` +
         `💰 Escrow Amount: ₹${escrowInfo.total_amount}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUX`;
-
-    await ctx.reply(msg);
+        `⚙️ Powered by @MRIXDUX`
+    );
 });
 
 // ==================== ERROR HANDLING ====================
 
-bot.catch((err, ctx) => {
-    console.error(`Error for ${ctx.updateType}:`, err);
-    ctx.reply('An error occurred while processing your request.').catch(() => {});
+bot.catch((err: any, ctx: any) => {
+    console.error(`Error:`, err);
+    ctx.reply('An error occurred.').catch(() => {});
 });
 
 // ==================== START BOT ====================
