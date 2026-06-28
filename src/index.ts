@@ -94,7 +94,10 @@ bot.start(async (ctx) => {
     await ctx.reply(
         '🤖 *Escrow Bot is running!*\n\n' +
         'Type `form` to get the escrow form.',
-        { parse_mode: 'Markdown' }
+        { 
+            parse_mode: 'Markdown',
+            reply_to_message_id: ctx.message.message_id  // ← Reply to the user
+        }
     );
 });
 
@@ -108,16 +111,18 @@ bot.command('help', async (ctx) => {
         '`/cancel` - Cancel trade (reply to trade message)\n' +
         '`/mydeals` - Your escrow stats\n' +
         '`/info` - User info (reply or @username)',
-        { parse_mode: 'Markdown' }
+        { 
+            parse_mode: 'Markdown',
+            reply_to_message_id: ctx.message.message_id
+        }
     );
 });
 
 // ============================================================
-// FORM HANDLER – SIMPLIFIED AND RELIABLE
+// FORM HANDLER – REPLIES TO THE USER
 // ============================================================
-// Check for exact match of "form" (case insensitive)
 bot.hears(/^form$/i, async (ctx) => {
-    console.log('Form triggered via hears!');
+    console.log('Form triggered!');
     const formMsg =
         '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
         '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
@@ -132,10 +137,12 @@ bot.hears(/^form$/i, async (ctx) => {
         'CRYPTO ADDRESS : (Optional)\n\n' +
         '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
         'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
-    await ctx.reply(formMsg);
+    
+    await ctx.reply(formMsg, {
+        reply_to_message_id: ctx.message.message_id  // ← This makes it a reply
+    });
 });
 
-// Also handle /form command
 bot.command('form', async (ctx) => {
     console.log('Form triggered via /form!');
     const formMsg =
@@ -152,66 +159,34 @@ bot.command('form', async (ctx) => {
         'CRYPTO ADDRESS : (Optional)\n\n' +
         '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
         'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
-    await ctx.reply(formMsg);
+    
+    await ctx.reply(formMsg, {
+        reply_to_message_id: ctx.message.message_id
+    });
 });
 
-// Also handle "deal" and "/deal"
-bot.hears(/^deal$/i, async (ctx) => {
-    console.log('Deal triggered!');
-    const formMsg =
-        '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
-        '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
-        '• Deal Info:   \n' +
-        '• Buyer:   \n' +
-        '• Seller:  \n' +
-        '• Amount:  \n' +
-        '• Duration:  \n' +
-        '• Escrow Until:  \n' +
-        '• Releasee Condition: (Optional)\n\n' +
-        '𝙀𝙓𝙏𝙍𝘼\n' +
-        'CRYPTO ADDRESS : (Optional)\n\n' +
-        '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
-        'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
-    await ctx.reply(formMsg);
-});
-
-bot.command('deal', async (ctx) => {
-    console.log('Deal triggered via /deal!');
-    const formMsg =
-        '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
-        '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
-        '• Deal Info:   \n' +
-        '• Buyer:   \n' +
-        '• Seller:  \n' +
-        '• Amount:  \n' +
-        '• Duration:  \n' +
-        '• Escrow Until:  \n' +
-        '• Releasee Condition: (Optional)\n\n' +
-        '𝙀𝙓𝙏𝙍𝘼\n' +
-        'CRYPTO ADDRESS : (Optional)\n\n' +
-        '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
-        'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
-    await ctx.reply(formMsg);
-});
-
-// ============================================================
-// /add command
-// ============================================================
+// /add command – replies to the form
 bot.command('add', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
-        await ctx.reply('⚠️ Only admins can add trades!');
+        await ctx.reply('⚠️ Only admins can add trades!', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
     const reply = ctx.message?.reply_to_message;
     if (!reply) {
-        await ctx.reply('⚠️ Reply to a form message.');
+        await ctx.reply('⚠️ Reply to a form message.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
     const text = ('text' in reply && reply.text) ? reply.text : '';
     if (!text || !text.includes('Deal Info')) {
-        await ctx.reply('⚠️ Invalid form message. Reply to a filled form.');
+        await ctx.reply('⚠️ Invalid form message. Reply to a filled form.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -228,6 +203,13 @@ bot.command('add', async (ctx) => {
         } else if (cleanLine.startsWith('Amount:')) {
             amount = cleanLine.split('Amount:')[1]?.trim() || '';
         }
+    }
+
+    if (!buyer || !seller || !amount) {
+        await ctx.reply('⚠️ Could not find Buyer, Seller, or Amount.', {
+            reply_to_message_id: ctx.message.message_id
+        });
+        return;
     }
 
     const chatId = ctx.chat.id.toString();
@@ -250,21 +232,25 @@ bot.command('add', async (ctx) => {
         `🙎🏻‍♂️ Seller: ${seller}\n\n` +
         `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
 
-    await ctx.reply(msg);
+    await ctx.reply(msg, {
+        reply_to_message_id: ctx.message.message_id
+    });
 });
 
-// ============================================================
 // /done command
-// ============================================================
 bot.command('done', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
-        await ctx.reply('⚠️ Only admins can release trades!');
+        await ctx.reply('⚠️ Only admins can release trades!', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
     const reply = ctx.message?.reply_to_message;
     if (!reply) {
-        await ctx.reply('⚠️ Reply to trade message.');
+        await ctx.reply('⚠️ Reply to trade message.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -280,7 +266,9 @@ bot.command('done', async (ctx) => {
     }
 
     if (!tradeInfo) {
-        await ctx.reply('⚠️ Trade not found.');
+        await ctx.reply('⚠️ Trade not found.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -318,21 +306,25 @@ bot.command('done', async (ctx) => {
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
         `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
 
-    await ctx.reply(msg);
+    await ctx.reply(msg, {
+        reply_to_message_id: ctx.message.message_id
+    });
 });
 
-// ============================================================
 // /cancel command
-// ============================================================
 bot.command('cancel', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
-        await ctx.reply('⚠️ Only admins can cancel trades!');
+        await ctx.reply('⚠️ Only admins can cancel trades!', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
     const reply = ctx.message?.reply_to_message;
     if (!reply) {
-        await ctx.reply('⚠️ Reply to trade message.');
+        await ctx.reply('⚠️ Reply to trade message.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -348,7 +340,9 @@ bot.command('cancel', async (ctx) => {
     }
 
     if (!tradeInfo) {
-        await ctx.reply('⚠️ Trade not found.');
+        await ctx.reply('⚠️ Trade not found.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -359,15 +353,17 @@ bot.command('cancel', async (ctx) => {
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
         `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
 
-    await ctx.reply(msg);
+    await ctx.reply(msg, {
+        reply_to_message_id: ctx.message.message_id
+    });
 });
 
-// ============================================================
 // /mydeals command
-// ============================================================
 bot.command('mydeals', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
-        await ctx.reply('⚠️ Admin only!');
+        await ctx.reply('⚠️ Admin only!', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -386,15 +382,17 @@ bot.command('mydeals', async (ctx) => {
         `━━━━━━━━━━━━━━━\n` +
         `⚙️ Powered by @mrixdufr`;
 
-    await ctx.reply(msg);
+    await ctx.reply(msg, {
+        reply_to_message_id: ctx.message.message_id
+    });
 });
 
-// ============================================================
 // /info command
-// ============================================================
 bot.command('info', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
-        await ctx.reply('⚠️ Admin only!');
+        await ctx.reply('⚠️ Admin only!', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -411,14 +409,18 @@ bot.command('info', async (ctx) => {
                 const chatMember = await ctx.telegram.getChatMember(ctx.chat.id, username as any);
                 targetUser = chatMember.user;
             } catch (error) {
-                await ctx.reply(`❌ Could not find user @${username}`);
+                await ctx.reply(`❌ Could not find user @${username}`, {
+                    reply_to_message_id: ctx.message.message_id
+                });
                 return;
             }
         }
     }
 
     if (!targetUser) {
-        await ctx.reply('Reply to a user\'s message or use /info @username.');
+        await ctx.reply('Reply to a user\'s message or use /info @username.', {
+            reply_to_message_id: ctx.message.message_id
+        });
         return;
     }
 
@@ -457,7 +459,9 @@ bot.command('info', async (ctx) => {
         `━━━━━━━━━━━━━━━\n` +
         `⚙️ Powered by @MRIXDUX`;
 
-    await ctx.reply(msg);
+    await ctx.reply(msg, {
+        reply_to_message_id: ctx.message.message_id
+    });
 });
 
 // ==================== ERROR HANDLING ====================
