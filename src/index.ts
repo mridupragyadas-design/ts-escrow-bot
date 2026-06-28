@@ -14,6 +14,7 @@ const ADMINS = [2096985880, 8737155576];
 
 const STATS_FILE = 'admin_stats.json';
 const USER_STATS_FILE = 'user_escrow_stats.json';
+const USER_CACHE_FILE = 'user_cache.json';
 
 // ==================== TYPES ====================
 interface AdminStats {
@@ -26,6 +27,14 @@ interface UserEscrowStats {
     total_escrows: number;
     total_amount: number;
     username: string;
+}
+
+interface UserCache {
+    user_id: number;
+    username: string;
+    first_name: string;
+    last_name?: string;
+    updated_at: string;
 }
 
 interface PendingTrade {
@@ -66,6 +75,81 @@ function saveUserStats(stats: Record<string, UserEscrowStats>): void {
     fs.writeJsonSync(USER_STATS_FILE, stats, { spaces: 2 });
 }
 
+// ==================== USER CACHE HELPERS ====================
+function loadUserCache(): Record<string, UserCache> {
+    if (fs.existsSync(USER_CACHE_FILE)) {
+        try {
+            return fs.readJsonSync(USER_CACHE_FILE);
+        } catch {
+            return {};
+        }
+    }
+    return {};
+}
+
+function saveUserCache(cache: Record<string, UserCache>): void {
+    fs.writeJsonSync(USER_CACHE_FILE, cache, { spaces: 2 });
+}
+
+async function updateUserCache(ctx: any, userId: number): Promise<void> {
+    try {
+        const member = await ctx.getChatMember(userId);
+        const user = member.user;
+        if (user.username) {
+            const cache = loadUserCache();
+            const key = user.username.toLowerCase();
+            cache[key] = {
+                user_id: user.id,
+                username: user.username,
+                first_name: user.first_name || '',
+                last_name: user.last_name || '',
+                updated_at: new Date().toISOString()
+            };
+            cache[`id_${user.id}`] = {
+                user_id: user.id,
+                username: user.username,
+                first_name: user.first_name || '',
+                last_name: user.last_name || '',
+                updated_at: new Date().toISOString()
+            };
+            saveUserCache(cache);
+        }
+    } catch (error) {
+        console.error('Failed to cache user:', error);
+    }
+}
+
+async function getUserByUsername(ctx: any, username: string): Promise<any> {
+    const usernameLower = username.toLowerCase();
+    const cache = loadUserCache();
+    
+    // Check cache first
+    if (cache[usernameLower]) {
+        try {
+            const member = await ctx.getChatMember(cache[usernameLower].user_id);
+            return member.user;
+        } catch {
+            delete cache[usernameLower];
+            saveUserCache(cache);
+        }
+    }
+    
+    // Scan group administrators
+    try {
+        const admins = await ctx.telegram.getChatAdministrators(ctx.chat.id);
+        for (const admin of admins) {
+            if (admin.user.username && admin.user.username.toLowerCase() === usernameLower) {
+                await updateUserCache(ctx, admin.user.id);
+                return admin.user;
+            }
+        }
+    } catch (error) {
+        console.error('Error scanning admins:', error);
+    }
+    
+    return null;
+}
+
 function isAdmin(userId: number): boolean {
     return ADMINS.includes(userId) || userId === OWNER_ID;
 }
@@ -87,7 +171,7 @@ const server = app.listen(PORT, () => {
 // ==================== TELEGRAM BOT ====================
 const bot = new Telegraf(BOT_TOKEN);
 
-// Helper function to reply to a message
+// ==================== REPLY HELPER ====================
 function replyToMessage(ctx: any, text: string, extra: any = {}) {
     return ctx.reply(text, {
         ...extra,
@@ -101,6 +185,7 @@ function replyToMessage(ctx: any, text: string, extra: any = {}) {
 
 // Start command
 bot.start(async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
     await replyToMessage(ctx,
         '🤖 *Escrow Bot is running!*\n\n' +
         'Type `form` to get the escrow form.',
@@ -110,6 +195,7 @@ bot.start(async (ctx) => {
 
 // Help command
 bot.command('help', async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
     await replyToMessage(ctx,
         '📋 *Available Commands*\n\n' +
         '`form` - Show escrow form\n' +
@@ -126,7 +212,7 @@ bot.command('help', async (ctx) => {
 // FORM HANDLER
 // ============================================================
 bot.hears(/^form$/i, async (ctx) => {
-    console.log('Form triggered!');
+    await updateUserCache(ctx, ctx.from.id);
     const formMsg =
         '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
         '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
@@ -146,7 +232,7 @@ bot.hears(/^form$/i, async (ctx) => {
 });
 
 bot.command('form', async (ctx) => {
-    console.log('Form triggered via /form!');
+    await updateUserCache(ctx, ctx.from.id);
     const formMsg =
         '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
         '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
@@ -169,6 +255,8 @@ bot.command('form', async (ctx) => {
 // /add command
 // ============================================================
 bot.command('add', async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
+    
     if (!isAdmin(ctx.from.id)) {
         await replyToMessage(ctx, '⚠️ Only admins can add trades!');
         return;
@@ -233,6 +321,8 @@ bot.command('add', async (ctx) => {
 // /done command
 // ============================================================
 bot.command('done', async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
+    
     if (!isAdmin(ctx.from.id)) {
         await replyToMessage(ctx, '⚠️ Only admins can release trades!');
         return;
@@ -301,6 +391,8 @@ bot.command('done', async (ctx) => {
 // /cancel command
 // ============================================================
 bot.command('cancel', async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
+    
     if (!isAdmin(ctx.from.id)) {
         await replyToMessage(ctx, '⚠️ Only admins can cancel trades!');
         return;
@@ -342,6 +434,8 @@ bot.command('cancel', async (ctx) => {
 // /mydeals command
 // ============================================================
 bot.command('mydeals', async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
+    
     if (!isAdmin(ctx.from.id)) {
         await replyToMessage(ctx, '⚠️ Admin only!');
         return;
@@ -366,9 +460,11 @@ bot.command('mydeals', async (ctx) => {
 });
 
 // ============================================================
-// /info command
+// /info command – with user cache
 // ============================================================
 bot.command('info', async (ctx) => {
+    await updateUserCache(ctx, ctx.from.id);
+    
     if (!isAdmin(ctx.from.id)) {
         await replyToMessage(ctx, '⚠️ Admin only!');
         return;
@@ -376,16 +472,23 @@ bot.command('info', async (ctx) => {
 
     let targetUser: any = null;
 
+    // Case 1: reply to a message
     if (ctx.message?.reply_to_message) {
         targetUser = ctx.message.reply_to_message.from;
-    } else {
+        await updateUserCache(ctx, targetUser.id);
+    }
+    // Case 2: /info @username
+    else {
         const text = ctx.message?.text || '';
         const parts = text.split(' ');
         if (parts.length > 1) {
             const username = parts[1].replace('@', '');
             try {
-                const chatMember = await ctx.telegram.getChatMember(ctx.chat.id, username as any);
-                targetUser = chatMember.user;
+                targetUser = await getUserByUsername(ctx, username);
+                if (!targetUser) {
+                    await replyToMessage(ctx, `❌ Could not find user @${username}\n\nMake sure:\n1. The user is in the group\n2. The bot is an admin\n3. The username is spelled correctly`);
+                    return;
+                }
             } catch (error) {
                 await replyToMessage(ctx, `❌ Could not find user @${username}`);
                 return;
@@ -398,6 +501,7 @@ bot.command('info', async (ctx) => {
         return;
     }
 
+    // Get group status
     let statusStr = 'Unknown';
     try {
         const member = await ctx.getChatMember(targetUser.id);
@@ -414,6 +518,7 @@ bot.command('info', async (ctx) => {
         statusStr = 'Unknown (bot may need admin rights)';
     }
 
+    // Escrow stats
     const userStats = loadUserStats();
     const key = (targetUser.username || '').toLowerCase();
     const escrowInfo = userStats[key] || { total_escrows: 0, total_amount: 0 };
@@ -434,6 +539,23 @@ bot.command('info', async (ctx) => {
         `⚙️ Powered by @MRIXDUX`;
 
     await replyToMessage(ctx, msg);
+});
+
+// ============================================================
+// Message handler – cache users and handle text
+// ============================================================
+bot.on('text', async (ctx) => {
+    // Cache the user
+    if (ctx.from) {
+        await updateUserCache(ctx, ctx.from.id);
+    }
+    
+    const text = ctx.message.text.toLowerCase().trim();
+    
+    // The hears handler will catch these, but if not, they'll be ignored here
+    if (text === 'form' || text === '/form' || text === 'deal' || text === '/deal') {
+        console.log('Text handler caught form:', text);
+    }
 });
 
 // ==================== ERROR HANDLING ====================
