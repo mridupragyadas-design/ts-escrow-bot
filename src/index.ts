@@ -312,7 +312,7 @@ bot.command('add', async (ctx) => {
         `💰 Amount: ₹${amount}\n` +
         `👨🏻‍💼 Buyer: ${buyer}\n` +
         `🙎🏻‍♂️ Seller: ${seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDU`;
 
     await replyToMessage(ctx, msg);
 });
@@ -382,7 +382,7 @@ bot.command('done', async (ctx) => {
         `💸 Amount: ₹${tradeInfo.amount}\n` +
         `👨🏻‍💼 Buyer: ${tradeInfo.buyer}\n` +
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDU`;
 
     await replyToMessage(ctx, msg);
 });
@@ -425,7 +425,7 @@ bot.command('cancel', async (ctx) => {
         `👮🏻‍♂️ Cancelled By: @${ctx.from.username || 'Unknown'}\n` +
         `👨🏻‍💼 Buyer: ${tradeInfo.buyer}\n` +
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDU`;
 
     await replyToMessage(ctx, msg);
 });
@@ -454,7 +454,7 @@ bot.command('mydeals', async (ctx) => {
         `🧑‍💼 Total Escrows Closed: ${String(count).padStart(3, '0')}\n\n` +
         `💰 INR Deals: ${String(count).padStart(3, '0')} | ₹${total}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @mrixdufr`;
+        `⚙️ Powered by @MRIXDUFR`;
 
     await replyToMessage(ctx, msg);
 });
@@ -536,7 +536,7 @@ bot.command('info', async (ctx) => {
         `✅ Total Escrows: ${escrowInfo.total_escrows}\n` +
         `💰 Escrow Amount: ₹${escrowInfo.total_amount}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUX`;
+        `⚙️ Powered by @MRIXDUFR`;
 
     await replyToMessage(ctx, msg);
 });
