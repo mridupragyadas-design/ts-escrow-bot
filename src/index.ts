@@ -1,5 +1,7 @@
 import { Telegraf } from 'telegraf';
+import express from 'express';
 import fs from 'fs-extra';
+import dotenv from 'dotenv';
 
 // ==================== CONFIG ====================
 // BOT_TOKEN is set as a Cloudflare Worker secret (wrangler secret put BOT_TOKEN)
