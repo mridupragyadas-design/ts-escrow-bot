@@ -1,5 +1,4 @@
 import { Telegraf } from 'telegraf';
-import { webhookCallback } from 'telegraf';
 import fs from 'fs-extra';
 
 // ==================== CONFIG ====================
@@ -397,7 +396,7 @@ export default {
 
         // Handle webhook requests
         if (request.method === 'POST' && new URL(request.url).pathname === '/webhook') {
-            return webhookCallback(bot, 'cloudflare-mod')(request);
+            return bot.webhookCallback('/webhook')(request as any);
         }
 
         // Health check
