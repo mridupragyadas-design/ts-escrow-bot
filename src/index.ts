@@ -148,7 +148,7 @@ bot.command('add', async (ctx) => {
         return;
     }
 
-    const text = reply.text;
+    const text = reply.text || '';
     if (!text || !text.includes('Deal Info')) {
         await ctx.reply('⚠️ Invalid form message.');
         return;
