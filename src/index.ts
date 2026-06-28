@@ -93,7 +93,7 @@ const bot = new Telegraf(BOT_TOKEN);
 bot.start(async (ctx) => {
     await ctx.reply(
         '🤖 *Escrow Bot is running!*\n\n' +
-        'Use `/help` to see available commands.',
+        'Type `form` to get the escrow form.',
         { parse_mode: 'Markdown' }
     );
 });
@@ -113,11 +113,11 @@ bot.command('help', async (ctx) => {
 });
 
 // ============================================================
-// FORM HANDLER – FIXED
+// FORM HANDLER – SIMPLIFIED AND RELIABLE
 // ============================================================
-// Check for "form" or "/form" or "deal" or "/deal"
-bot.hears(/^(form|\/form|\/deal|deal)$/i, async (ctx) => {
-    console.log('Form triggered!'); // Debug log
+// Check for exact match of "form" (case insensitive)
+bot.hears(/^form$/i, async (ctx) => {
+    console.log('Form triggered via hears!');
     const formMsg =
         '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
         '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
@@ -135,30 +135,68 @@ bot.hears(/^(form|\/form|\/deal|deal)$/i, async (ctx) => {
     await ctx.reply(formMsg);
 });
 
-// Also handle text messages that start with "form" (case insensitive)
-bot.on('text', async (ctx) => {
-    const text = ctx.message.text.toLowerCase().trim();
-    if (text === 'form' || text === '/form' || text === 'deal' || text === '/deal') {
-        console.log('Form triggered via text handler!');
-        const formMsg =
-            '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
-            '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
-            '• Deal Info:   \n' +
-            '• Buyer:   \n' +
-            '• Seller:  \n' +
-            '• Amount:  \n' +
-            '• Duration:  \n' +
-            '• Escrow Until:  \n' +
-            '• Releasee Condition: (Optional)\n\n' +
-            '𝙀𝙓𝙏𝙍𝘼\n' +
-            'CRYPTO ADDRESS : (Optional)\n\n' +
-            '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
-            'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
-        await ctx.reply(formMsg);
-    }
+// Also handle /form command
+bot.command('form', async (ctx) => {
+    console.log('Form triggered via /form!');
+    const formMsg =
+        '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
+        '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
+        '• Deal Info:   \n' +
+        '• Buyer:   \n' +
+        '• Seller:  \n' +
+        '• Amount:  \n' +
+        '• Duration:  \n' +
+        '• Escrow Until:  \n' +
+        '• Releasee Condition: (Optional)\n\n' +
+        '𝙀𝙓𝙏𝙍𝘼\n' +
+        'CRYPTO ADDRESS : (Optional)\n\n' +
+        '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
+        'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
+    await ctx.reply(formMsg);
 });
 
+// Also handle "deal" and "/deal"
+bot.hears(/^deal$/i, async (ctx) => {
+    console.log('Deal triggered!');
+    const formMsg =
+        '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
+        '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
+        '• Deal Info:   \n' +
+        '• Buyer:   \n' +
+        '• Seller:  \n' +
+        '• Amount:  \n' +
+        '• Duration:  \n' +
+        '• Escrow Until:  \n' +
+        '• Releasee Condition: (Optional)\n\n' +
+        '𝙀𝙓𝙏𝙍𝘼\n' +
+        'CRYPTO ADDRESS : (Optional)\n\n' +
+        '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
+        'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
+    await ctx.reply(formMsg);
+});
+
+bot.command('deal', async (ctx) => {
+    console.log('Deal triggered via /deal!');
+    const formMsg =
+        '𝙈𝙍𝙄𝙓𝘿𝙐 𝙀𝙎𝘾𝙍𝙊𝙒 𝙂𝙍𝙊𝙐𝙋🔐\n\n' +
+        '𝘿𝙚𝙖𝙡 𝘿𝙚𝙩𝙖𝙞𝙡𝙨\n' +
+        '• Deal Info:   \n' +
+        '• Buyer:   \n' +
+        '• Seller:  \n' +
+        '• Amount:  \n' +
+        '• Duration:  \n' +
+        '• Escrow Until:  \n' +
+        '• Releasee Condition: (Optional)\n\n' +
+        '𝙀𝙓𝙏𝙍𝘼\n' +
+        'CRYPTO ADDRESS : (Optional)\n\n' +
+        '⚠️ 𝙎𝙚𝙘𝙪𝙧𝙞𝙩𝙮 𝙉𝙤𝙩𝙞𝙘𝙚\n' +
+        'Admins will NEVER DM you for payment.Verify via /adminlist before proceeding.';
+    await ctx.reply(formMsg);
+});
+
+// ============================================================
 // /add command
+// ============================================================
 bot.command('add', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
         await ctx.reply('⚠️ Only admins can add trades!');
@@ -173,7 +211,7 @@ bot.command('add', async (ctx) => {
 
     const text = ('text' in reply && reply.text) ? reply.text : '';
     if (!text || !text.includes('Deal Info')) {
-        await ctx.reply('⚠️ Invalid form message.');
+        await ctx.reply('⚠️ Invalid form message. Reply to a filled form.');
         return;
     }
 
@@ -204,17 +242,20 @@ bot.command('add', async (ctx) => {
         amount,
     });
 
-    await ctx.reply(
+    const msg =
         `💰 𝗙𝘂𝗻𝗱𝘀 𝗔𝗱𝗱𝗲𝗱✅,𝗣𝗮𝘆𝗺𝗲𝗻𝘁 𝗥𝗲𝗰𝗲𝗶𝘃𝗲𝗱,𝗖𝗼𝗻𝘁𝗶𝗻𝘂𝗲 𝗗𝗲𝗮𝗹!\n\n` +
         `🧑‍💼 Escrower: @${ctx.from.username || 'Unknown'}\n` +
         `💰 Amount: ₹${amount}\n` +
         `👨🏻‍💼 Buyer: ${buyer}\n` +
         `🙎🏻‍♂️ Seller: ${seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`
-    );
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
+
+    await ctx.reply(msg);
 });
 
+// ============================================================
 // /done command
+// ============================================================
 bot.command('done', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
         await ctx.reply('⚠️ Only admins can release trades!');
@@ -269,17 +310,20 @@ bot.command('done', async (ctx) => {
     updateUserEscrow(tradeInfo.seller, amt);
     saveUserStats(userStats);
 
-    await ctx.reply(
+    const msg =
         `✅ 𝗙𝘂𝗻𝗱𝘀 𝗥𝗲𝗹𝗲𝗮𝘀𝗲𝗱/𝗧𝗿𝗮𝗱𝗲 𝗰𝗹𝗼𝘀𝗲𝗱!\n\n` +
         `🧑‍💼 Released By: @${ctx.from.username || 'Unknown'}\n` +
         `💸 Amount: ₹${tradeInfo.amount}\n` +
         `👨🏻‍💼 Buyer: ${tradeInfo.buyer}\n` +
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`
-    );
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
+
+    await ctx.reply(msg);
 });
 
+// ============================================================
 // /cancel command
+// ============================================================
 bot.command('cancel', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
         await ctx.reply('⚠️ Only admins can cancel trades!');
@@ -308,16 +352,19 @@ bot.command('cancel', async (ctx) => {
         return;
     }
 
-    await ctx.reply(
+    const msg =
         `🔴 𝗧𝗿𝗮𝗱𝗲/𝗗𝗲𝗮𝗹 𝗖𝗮𝗻𝗰𝗲𝗹𝗹𝗲𝗱!!!!\n\n` +
         `👮🏻‍♂️ Cancelled By: @${ctx.from.username || 'Unknown'}\n` +
         `👨🏻‍💼 Buyer: ${tradeInfo.buyer}\n` +
         `🙎🏻‍♂️ Seller: ${tradeInfo.seller}\n\n` +
-        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`
-    );
+        `🔐 𝗖𝗥𝗘𝗔𝗧𝗘𝗗 𝗕𝗬 @MRIXDUX`;
+
+    await ctx.reply(msg);
 });
 
+// ============================================================
 // /mydeals command
+// ============================================================
 bot.command('mydeals', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
         await ctx.reply('⚠️ Admin only!');
@@ -331,17 +378,20 @@ bot.command('mydeals', async (ctx) => {
     const count = stats[userId]?.count || 0;
     const total = stats[userId]?.total || 0;
 
-    await ctx.reply(
+    const msg =
         `📊 Your Escrow Stats @${username}\n` +
         `━━━━━━━━━━━━━━━\n` +
         `🧑‍💼 Total Escrows Closed: ${String(count).padStart(3, '0')}\n\n` +
         `💰 INR Deals: ${String(count).padStart(3, '0')} | ₹${total}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @mrixdufr`
-    );
+        `⚙️ Powered by @mrixdufr`;
+
+    await ctx.reply(msg);
 });
 
+// ============================================================
 // /info command
+// ============================================================
 bot.command('info', async (ctx) => {
     if (!isAdmin(ctx.from.id)) {
         await ctx.reply('⚠️ Admin only!');
@@ -392,7 +442,7 @@ bot.command('info', async (ctx) => {
     const key = (targetUser.username || '').toLowerCase();
     const escrowInfo = userStats[key] || { total_escrows: 0, total_amount: 0 };
 
-    await ctx.reply(
+    const msg =
         `👤 User Info\n` +
         `━━━━━━━━━━━━━━━\n` +
         `🆔 ID: ${targetUser.id}\n` +
@@ -405,8 +455,9 @@ bot.command('info', async (ctx) => {
         `✅ Total Escrows: ${escrowInfo.total_escrows}\n` +
         `💰 Escrow Amount: ₹${escrowInfo.total_amount}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUX`
-    );
+        `⚙️ Powered by @MRIXDUX`;
+
+    await ctx.reply(msg);
 });
 
 // ==================== ERROR HANDLING ====================
