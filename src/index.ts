@@ -238,7 +238,7 @@ async function postDoneLog(ctx: any, deal: DealRecord): Promise<void> {
     const amt = parseFloat((deal.amount || '0').replace(/[₹,]/g, '')) || 0;
 
     const logMsg =
-        `✅ Escrow Deal — Done!\n` +
+        `Escrow Deal — Done!\n` +
         `ID - DL-${deal.deal_code}\n` +
         `Escrower - ${escrowerDisplay}\n` +
         `Buyer - ${maskUsername(deal.buyer)}\n` +
@@ -710,13 +710,13 @@ bot.command('vouchinfo', async (ctx) => {
 
     const vouch = result.rows[0];
     const msg =
-        `🛡️ VOUCH RECORD\n\n` +
-        `👤 Vouched User:\n${escapeHtml(vouch.vouched_user)}\n\n` +
-        `👥 Buyer:\n${escapeHtml(vouch.buyer)}\n\n` +
-        `👥 Seller:\n${escapeHtml(vouch.seller)}\n\n` +
-        `💰 Vouch Limit:\n₹${escapeHtml(vouch.amount)}\n\n` +
-        `🆔 Vouch ID:\n<code>${vouch.vouch_id}</code>\n\n` +
-        `👨‍💻 Guaranteed By:\n@${escapeHtml(vouch.guaranteed_by)}`;
+        `VOUCH RECORD\n\n` +
+        `Vouched User:\n${escapeHtml(vouch.vouched_user)}\n\n` +
+        `Buyer:\n${escapeHtml(vouch.buyer)}\n\n` +
+        `Seller:\n${escapeHtml(vouch.seller)}\n\n` +
+        `Vouch Limit:\n₹${escapeHtml(vouch.amount)}\n\n` +
+        `Vouch ID:\n<code>${vouch.vouch_id}</code>\n\n` +
+        `Guaranteed By:\n@${escapeHtml(vouch.guaranteed_by)}`;
 
     await replyToMessage(ctx, msg, { parse_mode: 'HTML' });
 });
@@ -745,28 +745,26 @@ bot.command('deal', async (ctx) => {
     let extraLines = '';
 
     if (deal.status === 'pending') {
-        statusLine = '⏳ Pending';
-        extraLines = `🧑‍💼 Escrower: @${deal.created_by}\n`;
+        statusLine = 'Pending';
+        extraLines = `Escrower: @${deal.created_by}\n`;
     } else if (deal.status === 'done') {
-        statusLine = '✅ Completed';
-        extraLines = `🧑‍💼 Released By: @${deal.closed_by || 'Unknown'}\n`;
+        statusLine = 'Completed';
+        extraLines = `Released By: @${deal.closed_by || 'Unknown'}\n`;
     } else {
-        statusLine = '🔴 Cancelled';
-        extraLines = `👮🏻‍♂️ Cancelled By: @${deal.closed_by || 'Unknown'}\n`;
+        statusLine = 'Cancelled';
+        extraLines = `Cancelled By: @${deal.closed_by || 'Unknown'}\n`;
     }
 
     const msg =
         `🔎 Deal Lookup\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `🆔 Deal Code: <code>${deal.deal_code}</code>\n` +
-        `📌 Status: ${statusLine}\n\n` +
-        `👨🏻‍💼 Buyer: ${escapeHtml(deal.buyer)}\n` +
-        `🙎🏻‍♂️ Seller: ${escapeHtml(deal.seller)}\n` +
-        `💰 Amount: ₹${escapeHtml(deal.amount)}\n` +
-        `🧾 Fees: ₹${calculateFee(parseFloat((deal.amount || '0').replace(/[₹,]/g, '')) || 0).toFixed(2)}\n` +
-        extraLines +
-        `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUFR`;
+        `Deal Code: <code>${deal.deal_code}</code>\n` +
+        `Status: ${statusLine}\n\n` +
+        `Buyer: ${escapeHtml(deal.buyer)}\n` +
+        `Seller: ${escapeHtml(deal.seller)}\n` +
+        `Amount: ₹${escapeHtml(deal.amount)}\n` +
+        `Fees: ₹${calculateFee(parseFloat((deal.amount || '0').replace(/[₹,]/g, '')) || 0).toFixed(2)}\n` +
+        extraLines +;
 
     await replyToMessage(ctx, msg, { parse_mode: 'HTML' });
 });
@@ -817,11 +815,9 @@ bot.command('stats', async (ctx) => {
     if (allDeals.length === 0) {
         await replyToMessage(
             ctx,
-            `📊 Escrow Stats — ${displayName}\n` +
+            `Escrow Stats — ${displayName}\n` +
             `━━━━━━━━━━━━━━━\n` +
             `No escrow history found for this user.\n` +
-            `━━━━━━━━━━━━━━━\n` +
-            `⚙️ Powered by @MRIXDUFR`
         );
         return;
     }
@@ -839,17 +835,16 @@ bot.command('stats', async (ctx) => {
     }
 
     const msg =
-        `📊 Escrow Stats — ${displayName}\n` +
+        `Escrow Stats — ${displayName}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `✅ Completed Deals: ${completed}\n` +
-        `🔴 Cancelled Deals: ${cancelled}\n` +
-        `⏳ Pending Deals: ${pending}\n` +
+        `Completed Deals: ${completed}\n` +
+        `Cancelled Deals: ${cancelled}\n` +
+        `Pending Deals: ${pending}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `💰 Total Volume: ₹${totalVolume.toFixed(2)}\n` +
-        `🧑‍💼 As Buyer: ${asBuyer.length} deals\n` +
-        `🙎🏻‍♂️ As Seller: ${asSeller.length} deals\n` +
-        `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUFR`;
+        `Total Volume: ₹${totalVolume.toFixed(2)}\n` +
+        `As Buyer: ${asBuyer.length} deals\n` +
+        `As Seller: ${asSeller.length} deals\n` +
+        `━━━━━━━━━━━━━━━\n` +;
 
     await replyToMessage(ctx, msg);
 });
@@ -878,12 +873,11 @@ bot.command('mydeals', async (ctx) => {
     const count = result.rowCount || 0;
 
     const msg =
-        `📊 Your Escrow Stats @${username}\n` +
+        `Your Escrow Stats @${username}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `🧑‍💼 Total Escrows Closed: ${String(count).padStart(3, '0')}\n\n` +
-        `💰 INR Deals: ${String(count).padStart(3, '0')} | ₹${total.toFixed(2)}\n` +
-        `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUFR`;
+        `Total Escrows Closed: ${String(count).padStart(3, '0')}\n\n` +
+        `INR Deals: ${String(count).padStart(3, '0')} | ₹${total.toFixed(2)}\n` +
+        `━━━━━━━━━━━━━━━\n` +;
 
     await replyToMessage(ctx, msg);
 });
@@ -916,16 +910,15 @@ bot.command('allstats', async (ctx) => {
     const totalDeals = result.rowCount || 0;
 
     const msg =
-        `📈 Group Escrow Stats\n` +
+        `Group Escrow Stats\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `📦 Total Deals Ever: ${totalDeals}\n` +
-        `✅ Completed: ${completed}\n` +
-        `🔴 Cancelled: ${cancelled}\n` +
-        `⏳ Pending: ${pending}\n` +
+        `Total Deals Ever: ${totalDeals}\n` +
+        `Completed: ${completed}\n` +
+        `Cancelled: ${cancelled}\n` +
+        `Pending: ${pending}\n` +
         `━━━━━━━━━━━━━━━\n` +
-        `💰 Total Volume (Completed): ₹${totalVolume.toFixed(2)}\n` +
-        `━━━━━━━━━━━━━━━\n` +
-        `⚙️ Powered by @MRIXDUFR`;
+        `Total Volume (Completed): ₹${totalVolume.toFixed(2)}\n` +
+        `━━━━━━━━━━━━━━━\n` +;
 
     await replyToMessage(ctx, msg);
 });
