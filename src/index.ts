@@ -245,8 +245,7 @@ async function postDoneLog(ctx: any, deal: DealRecord): Promise<void> {
         `Seller - ${maskUsername(deal.seller)}\n` +
         `Deal Amount - ${amt.toFixed(2)}₹\n` +
         `Total Completed Escrows: ${count}\n` +
-        `Completed Escrow Worth: ${totalWorth.toFixed(2)}₹\n\n` +
-        `By @MRIXDU`;
+        `Completed Escrow Worth: ${totalWorth.toFixed(2)}₹`;
 
     try {
         await ctx.telegram.sendMessage(LOG_CHANNEL_ID, logMsg);
@@ -510,7 +509,7 @@ bot.command('add', async (ctx) => {
     );
 
     const msg =
-        `Payment Received! Continue Your Deal\n` +
+        `Payment Received! Continue Your Deal\n\n` +
         `Deal - <code>DL-${dealCode}</code>\n` +
         `Seller - ${escapeHtml(seller)}\n` +
         `Buyer - ${escapeHtml(buyer)}\n` +
@@ -559,7 +558,7 @@ bot.command('done', async (ctx) => {
     );
 
     const msg =
-        `Deal completed!\n` +
+        `Deal Completed!\n\n` +
         `Deal - <code>DL-${deal.deal_code}</code>\n` +
         `Seller - ${escapeHtml(deal.seller)}\n` +
         `Buyer - ${escapeHtml(deal.buyer)}\n` +
@@ -612,7 +611,7 @@ bot.command('cancel', async (ctx) => {
     );
 
     const msg =
-        `Deal Cancel! Amount refunded.\n` +
+        `Deal Cancel! Amount refunded.\n\n` +
         `Deal - <code>DL-${deal.deal_code}</code>\n` +
         `Seller - ${escapeHtml(deal.seller)}\n` +
         `Buyer - ${escapeHtml(deal.buyer)}\n` +
@@ -677,13 +676,13 @@ bot.command('vouch', async (ctx) => {
     );
 
     const msg =
-        `Vouch Active!\n` +
+        `Vouch Active!\n\n` +
         `Vouch id - <code>VH-${vouchId}</code>\n` +
         `Vouched User - ${escapeHtml(vouchedUser)}\n` +
         `Buyer - ${escapeHtml(buyer)}\n` +
         `Seller - ${escapeHtml(seller)}\n` +
         `Vouch limit - ₹${escapeHtml(amount)}\n` +
-        `Gureented by : @${escapeHtml(guaranteedBy)}\n` +
+        `Gureented by : @${escapeHtml(guaranteedBy)}\n\n` +
         `After the deal is completed, tag the vouching admin in thus group.`;
 
     await replyToMessage(ctx, msg, { parse_mode: 'HTML' });
